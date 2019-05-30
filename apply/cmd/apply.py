@@ -76,7 +76,7 @@ def apply(parser, args):
 
         modulefile = ["#%Module -*- tcl -*-"]
         modulefile += [
-            "prepend_path {: >30} {}".format(i.name, os.path.realpath(i.value))
+            "prepend-path {: >30} {}".format(i.name, os.path.realpath(i.value))
             for i in spack.util.environment.inspect_path(
                 prefix,
                 spack.config.get("modules:prefix_inspections", {}),
