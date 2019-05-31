@@ -4,13 +4,14 @@ import collections
 import sys, os
 
 import llnl.util.tty as tty
-import llnl.util.filesystem as filesystem
+import llnl.util.filesystem as fs
+import ruamel
 
 import spack
 import spack.cmd
+import spack.environment as ev
 import spack.util.spack_yaml as syaml
 from spack.error import SpackError
-from spack.filesystem_view import YamlFilesystemView
 
 description = (
     "install and make available as custom modules a description of an environment"
@@ -25,7 +26,7 @@ def setup_parser(subparser):
     )
     subparser.add_argument(
         "--modules",
-        default="./modulefiles",
+        default="./install/modulefiles",
         type=str,
         help="where to put the tree of modulefiles",
     )
@@ -45,7 +46,7 @@ def apply(parser, args):
             [
                 s
                 for spec in m["packages"]
-                for s in spack.cmd.parse_specs(spec, concretize=True)
+                for s in spack.cmd.parse_specs(spec)
             ],
         )
         for c in args.configs
@@ -53,26 +54,25 @@ def apply(parser, args):
     ]
 
     for m in modules:
-        tty.msg("Building module %s" % m.name)
+        prefix = fs.join_path(args.install, m.name)
+        tty.msg("Building module %s at %s" % (m.name, prefix))
 
-        for s in [s for s in m.specs if not s.package.installed]:
-            s.package.do_install()
+        yaml_dict = {}
+        yaml_dict['view'] = fs.join_path(args.install, m.name)
+        yaml_spec_list = yaml_dict.setdefault('specs', [])
+        yaml_spec_list[:] = [str(s) for s in m.specs]
 
-        prefix = filesystem.join_path(args.install, m.name)
-        view = YamlFilesystemView(
-            prefix,
-            spack.store.layout,
-            ignore_conflicts=True,
-            link=os.symlink,
-            verbose=args.verbose,
+        fs.mkdirp(prefix)
+        with fs.write_tmp_and_move(fs.join_path(prefix, "spack.yaml")) as f:
+            ruamel.yaml.dump({'spack': yaml_dict}, f)
+
+        env = ev.get_env(
+            collections.namedtuple("Fakeargs", "env")(env=prefix),
+            "apply",
+            required=True,
         )
-        view.remove_specs(
-            *(set(view.get_all_specs()) - set(m.specs)), with_dependencies=False
-        )
-        view.add_specs(
-            *(set(m.specs) - set(view.get_all_specs())), with_dependencies=False
-        )
-        view.print_status(*m.specs)
+        env.concretize(force=True)
+        env.install_all()
 
         modulefile = ["#%Module -*- tcl -*-"]
         modulefile += [
@@ -83,9 +83,9 @@ def apply(parser, args):
                 exclude=spack.util.environment.is_system_path,
             )
         ]
-        modulefile_path = filesystem.join_path(args.modules, m.name)
+        modulefile_path = fs.join_path(args.modules, m.name)
 
         tty.msg("Writing modulefile at %s" % modulefile_path)
-        filesystem.mkdirp(filesystem.ancestor(modulefile_path))
-        with open(modulefile_path, "w") as f:
-            f.write('\n'.join(modulefile))
+        fs.mkdirp(fs.ancestor(modulefile_path))
+        with fs.write_tmp_and_move(modulefile_path) as f:
+            f.write("\n".join(modulefile))
