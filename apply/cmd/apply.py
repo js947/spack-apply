@@ -89,3 +89,7 @@ def apply(parser, args):
         fs.mkdirp(fs.ancestor(modulefile_path))
         with fs.write_tmp_and_move(modulefile_path) as f:
             f.write("\n".join(modulefile))
+
+        print()
+
+    tty.msg("Done!")
