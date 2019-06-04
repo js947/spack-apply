@@ -63,7 +63,7 @@ def apply(parser, args):
         yaml_spec_list[:] = [str(s) for s in m.specs]
 
         fs.mkdirp(prefix)
-        with fs.write_tmp_and_move(fs.join_path(prefix, "spack.yaml")) as f:
+        with open(fs.join_path(prefix, "spack.yaml"), 'w') as f:
             ruamel.yaml.dump({'spack': yaml_dict}, f)
 
         env = ev.get_env(
@@ -87,7 +87,7 @@ def apply(parser, args):
 
         tty.msg("Writing modulefile at %s" % modulefile_path)
         fs.mkdirp(fs.ancestor(modulefile_path))
-        with fs.write_tmp_and_move(modulefile_path) as f:
+        with open(modulefile_path, 'w') as f:
             f.write("\n".join(modulefile))
 
         print()
