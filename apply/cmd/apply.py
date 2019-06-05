@@ -42,14 +42,16 @@ def apply(parser, args):
     class Module:
         def __init__(self, name, specs):
             self.name, self.specs = name, specs
+            self.prefix = fs.join_path(args.install, m.name)
+            self.env_file = fs.join_path(self.prefix, "spack.yaml")
+            self.module_file = fs.join_path(args.modules, m.name)
 
-        @property
-        def prefix(self):
-            return fs.join_path(args.install, m.name)
-
-        @property
-        def env_file(self):
-            return fs.join_path(self.prefix, "spack.yaml")
+        def get_env(self):
+            return ev.get_env(
+                collections.namedtuple("Fakeargs", "env")(env=self.prefix),
+                "apply",
+                required=True,
+            )
 
         @property
         def env_defn(self):
@@ -59,10 +61,6 @@ def apply(parser, args):
             yaml_spec_list[:] = [str(s) for s in m.specs]
 
             return {"spack": yaml_dict}
-
-        @property
-        def module_file(self):
-            return fs.join_path(args.modules, m.name)
 
         @property
         def module_defn(self):
@@ -93,11 +91,7 @@ def apply(parser, args):
         with open(m.env_file, "w") as f:
             ruamel.yaml.dump(m.env_defn, f)
 
-        env = ev.get_env(
-            collections.namedtuple("Fakeargs", "env")(env=m.prefix),
-            "apply",
-            required=True,
-        )
+        env = m.get_env()
         env.concretize(force=True)
         env.install_all()
 
