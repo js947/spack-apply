@@ -75,7 +75,17 @@ def apply(parser, args):
 
             modulefile = ["#%Module -*- tcl -*-"]
             modulefile += [
-                "prepend-path {: >30} {}".format(i.name, os.path.realpath(i.value))
+                "{} {: >30} {}".format(
+                    {
+                        "SetEnv": "setenv",
+                        "UnSetEnv": "unsetenv",
+                        "AppendPath": "append-path",
+                        "PrependPath": "prepend-path",
+                        "RemovePath": "remove-path",
+                    }[type(i).__name__],
+                    i.name,
+                    os.path.realpath(i.value),
+                )
                 for i in env
             ]
             return "\n".join(modulefile)
