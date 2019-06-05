@@ -39,56 +39,73 @@ def setup_parser(subparser):
 
 
 def apply(parser, args):
-    Module = collections.namedtuple("Module", "name,specs")
+    class Module:
+        def __init__(self, name, specs):
+            self.name, self.specs = name, specs
+
+        @property
+        def prefix(self):
+            return fs.join_path(args.install, m.name)
+
+        @property
+        def env_file(self):
+            return fs.join_path(self.prefix, "spack.yaml")
+
+        @property
+        def env_defn(self):
+            yaml_dict = {}
+            yaml_dict["view"] = fs.join_path(args.install, m.name)
+            yaml_spec_list = yaml_dict.setdefault("specs", [])
+            yaml_spec_list[:] = [str(s) for s in m.specs]
+
+            return {"spack": yaml_dict}
+
+        @property
+        def module_file(self):
+            return fs.join_path(args.modules, m.name)
+
+        @property
+        def module_defn(self):
+            modulefile = ["#%Module -*- tcl -*-"]
+            modulefile += [
+                "prepend-path {: >30} {}".format(i.name, os.path.realpath(i.value))
+                for i in spack.util.environment.inspect_path(
+                    m.prefix,
+                    spack.config.get("modules:prefix_inspections", {}),
+                    exclude=spack.util.environment.is_system_path,
+                )
+            ]
+            return "\n".join(modulefile)
+
     modules = [
         Module(
             m["name"],
-            [
-                s
-                for spec in m["packages"]
-                for s in spack.cmd.parse_specs(spec)
-            ],
+            [s for spec in m["packages"] for s in spack.cmd.parse_specs(spec)],
         )
         for c in args.configs
         for m in syaml.load(c)
     ]
 
     for m in modules:
-        prefix = fs.join_path(args.install, m.name)
-        tty.msg("Building module %s at %s" % (m.name, prefix))
+        tty.msg("Building module %s at %s" % (m.name, m.prefix))
 
-        yaml_dict = {}
-        yaml_dict['view'] = fs.join_path(args.install, m.name)
-        yaml_spec_list = yaml_dict.setdefault('specs', [])
-        yaml_spec_list[:] = [str(s) for s in m.specs]
-
-        fs.mkdirp(prefix)
-        with open(fs.join_path(prefix, "spack.yaml"), 'w') as f:
-            ruamel.yaml.dump({'spack': yaml_dict}, f)
+        fs.mkdirp(fs.ancestor(m.env_file))
+        with open(m.env_file, "w") as f:
+            ruamel.yaml.dump(m.env_defn, f)
 
         env = ev.get_env(
-            collections.namedtuple("Fakeargs", "env")(env=prefix),
+            collections.namedtuple("Fakeargs", "env")(env=m.prefix),
             "apply",
             required=True,
         )
         env.concretize(force=True)
         env.install_all()
 
-        modulefile = ["#%Module -*- tcl -*-"]
-        modulefile += [
-            "prepend-path {: >30} {}".format(i.name, os.path.realpath(i.value))
-            for i in spack.util.environment.inspect_path(
-                prefix,
-                spack.config.get("modules:prefix_inspections", {}),
-                exclude=spack.util.environment.is_system_path,
-            )
-        ]
-        modulefile_path = fs.join_path(args.modules, m.name)
+        tty.msg("Writing modulefile at %s" % m.module_file)
 
-        tty.msg("Writing modulefile at %s" % modulefile_path)
-        fs.mkdirp(fs.ancestor(modulefile_path))
-        with open(modulefile_path, 'w') as f:
-            f.write("\n".join(modulefile))
+        fs.mkdirp(fs.ancestor(m.module_file))
+        with open(m.module_file, "w") as f:
+            f.write(m.module_defn)
 
         print()
 
