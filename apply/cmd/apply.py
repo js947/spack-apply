@@ -40,8 +40,8 @@ def setup_parser(subparser):
 
 def apply(parser, args):
     class Module:
-        def __init__(self, name, specs):
-            self.name, self.specs = name, specs
+        def __init__(self, name, specs, variables):
+            self.name, self.specs, self.variables = name, specs, variables
             self.prefix = fs.join_path(args.install, self.name)
             self.env_file = fs.join_path(self.prefix, "spack.yaml")
             self.module_file = fs.join_path(args.modules, self.name)
@@ -73,6 +73,10 @@ def apply(parser, args):
             for spec in self.env._get_environment_specs():
                 spec.package.setup_environment(_, env)
 
+            for k, v in self.variables.items():
+                print(k,v)
+                env.set(k, v)
+
             modulefile = ["#%Module -*- tcl -*-"]
             modulefile += [
                 "{} {: >30} {}".format(
@@ -84,7 +88,7 @@ def apply(parser, args):
                         "RemovePath": "remove-path",
                     }[type(i).__name__],
                     i.name,
-                    os.path.realpath(i.value),
+                    i.value,
                 )
                 for i in env
             ]
@@ -94,6 +98,7 @@ def apply(parser, args):
         Module(
             m["name"],
             [s for spec in m["packages"] for s in spack.cmd.parse_specs(spec)],
+            m.get("variables", {}),
         )
         for c in args.configs
         for m in syaml.load(c)
