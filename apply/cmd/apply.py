@@ -42,9 +42,9 @@ def apply(parser, args):
     class Module:
         def __init__(self, name, specs):
             self.name, self.specs = name, specs
-            self.prefix = fs.join_path(args.install, m.name)
+            self.prefix = fs.join_path(args.install, self.name)
             self.env_file = fs.join_path(self.prefix, "spack.yaml")
-            self.module_file = fs.join_path(args.modules, m.name)
+            self.module_file = fs.join_path(args.modules, self.name)
 
         def get_env(self):
             return ev.get_env(
