@@ -46,8 +46,7 @@ def apply(parser, args):
             self.env_file = fs.join_path(self.prefix, "spack.yaml")
             self.module_file = fs.join_path(args.modules, self.name)
 
-        def get_env(self):
-            return ev.get_env(
+            self.env = ev.get_env(
                 collections.namedtuple("Fakeargs", "env")(env=self.prefix),
                 "apply",
                 required=True,
@@ -56,22 +55,28 @@ def apply(parser, args):
         @property
         def env_defn(self):
             yaml_dict = {}
-            yaml_dict["view"] = fs.join_path(args.install, m.name)
+            yaml_dict["view"] = fs.join_path(args.install, self.name)
             yaml_spec_list = yaml_dict.setdefault("specs", [])
-            yaml_spec_list[:] = [str(s) for s in m.specs]
+            yaml_spec_list[:] = [str(s) for s in self.specs]
 
             return {"spack": yaml_dict}
 
         @property
         def module_defn(self):
+            env = spack.util.environment.inspect_path(
+                self.prefix,
+                spack.config.get("modules:prefix_inspections", {}),
+                exclude=spack.util.environment.is_system_path,
+            )
+            _ = spack.util.environment.EnvironmentModifications()
+
+            for spec in self.env._get_environment_specs():
+                spec.package.setup_environment(_, env)
+
             modulefile = ["#%Module -*- tcl -*-"]
             modulefile += [
                 "prepend-path {: >30} {}".format(i.name, os.path.realpath(i.value))
-                for i in spack.util.environment.inspect_path(
-                    m.prefix,
-                    spack.config.get("modules:prefix_inspections", {}),
-                    exclude=spack.util.environment.is_system_path,
-                )
+                for i in env
             ]
             return "\n".join(modulefile)
 
@@ -91,9 +96,8 @@ def apply(parser, args):
         with open(m.env_file, "w") as f:
             ruamel.yaml.dump(m.env_defn, f)
 
-        env = m.get_env()
-        env.concretize(force=True)
-        env.install_all()
+        m.env.concretize(force=True)
+        m.env.install_all()
 
         tty.msg("Writing modulefile at %s" % m.module_file)
 
