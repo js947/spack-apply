@@ -49,11 +49,17 @@ def apply(parser, args):
             self.env_file = fs.join_path(self.prefix, "spack.yaml")
             self.module_file = fs.join_path(args.modules, self.name)
 
-            self.env = ev.get_env(
-                collections.namedtuple("Fakeargs", "env")(env=self.prefix),
-                "apply",
-                required=True,
-            )
+            self._env = None
+
+        @property
+        def env(self):
+            if not self._env: 
+                self._env = ev.get_env(
+                    collections.namedtuple("Fakeargs", "env")(env=self.prefix),
+                    "apply",
+                    required=True,
+                )
+            return self._env
 
         @property
         def env_defn(self):
