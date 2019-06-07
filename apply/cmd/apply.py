@@ -22,11 +22,14 @@ level = "long"
 
 def setup_parser(subparser):
     subparser.add_argument(
-        "--install", default="./install", type=str, help="where to put the install tree"
+        "--install",
+        default=os.environ.get("SPACK_APPLY_INSTALL_PATH", None),
+        type=str,
+        help="where to put the install tree",
     )
     subparser.add_argument(
         "--modules",
-        default="./install/modulefiles",
+        default=os.environ.get("SPACK_APPLY_MODULEFILES_PATH", None),
         type=str,
         help="where to put the tree of modulefiles",
     )
