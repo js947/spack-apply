@@ -77,7 +77,6 @@ def apply(parser, args):
                 spec.package.setup_environment(_, env)
 
             for k, v in self.variables.items():
-                print(k,v)
                 env.set(k, v)
 
             modulefile = ["#%Module -*- tcl -*-"]
