@@ -53,7 +53,7 @@ def apply(parser, args):
 
         @property
         def env(self):
-            if not self._env: 
+            if not self._env:
                 self._env = ev.get_env(
                     collections.namedtuple("Fakeargs", "env")(env=self.prefix),
                     "apply",
@@ -105,7 +105,7 @@ def apply(parser, args):
     modules = [
         Module(
             m["name"],
-            [s for spec in m["packages"] for s in spack.cmd.parse_specs(spec)],
+            [s for spec in m["specs"] for s in spack.cmd.parse_specs(spec)],
             m.get("variables", {}),
         )
         for c in args.configs
