@@ -1,0 +1,10 @@
+- name: zlib/1
+  whatis: zlib version 1
+  specs:
+    - zlib@1.2.8
+    - xz@5.2.3
+
+- name: zlib/2
+  specs:
+    - zlib@1.2.11
+    - xz@5.2.4

@@ -1,0 +1,5 @@
+test:
+  before_script:
+    - git clone --depth=1 https://github.com/spack/spack
+  script:
+    - bash test/run.sh

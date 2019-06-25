@@ -43,8 +43,13 @@ def setup_parser(subparser):
 
 def apply(parser, args):
     class Module:
-        def __init__(self, name, specs, variables):
-            self.name, self.specs, self.variables = name, specs, variables
+        def __init__(self, name, specs, variables, whatis):
+            self.name, self.specs, self.variables, self.whatis = (
+                name,
+                specs,
+                variables,
+                whatis,
+            )
             self.prefix = fs.join_path(args.install, self.name)
             self.env_file = fs.join_path(self.prefix, "spack.yaml")
             self.module_file = fs.join_path(args.modules, self.name)
@@ -100,6 +105,8 @@ def apply(parser, args):
                 )
                 for i in env
             ]
+            if self.whatis:
+                modulefile.append('module-whatis "%s"' % str(self.whatis))
             return "\n".join(modulefile)
 
     modules = [
@@ -107,6 +114,7 @@ def apply(parser, args):
             m["name"],
             [s for spec in m["specs"] for s in spack.cmd.parse_specs(spec)],
             m.get("variables", {}),
+            m.get("whatis", ""),
         )
         for c in args.configs
         for m in syaml.load(c)
