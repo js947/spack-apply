@@ -11,7 +11,9 @@ import spack
 import spack.cmd
 import spack.environment as ev
 import spack.util.spack_yaml as syaml
+import spack.build_environment as build_environment
 from spack.error import SpackError
+
 
 description = (
     "install and make available as custom modules a description of an environment"
@@ -85,6 +87,7 @@ def apply(parser, args):
             _ = spack.util.environment.EnvironmentModifications()
 
             for spec in self.env._get_environment_specs():
+                build_environment.set_module_variables_for_package(spec.package)
                 spec.package.setup_environment(_, env)
 
             for k, v in self.variables.items():
