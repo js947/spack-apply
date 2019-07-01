@@ -98,13 +98,13 @@ def apply(parser, args):
                 "{} {: >30} {}".format(
                     {
                         "SetEnv": "setenv",
-                        "UnSetEnv": "unsetenv",
+                        "UnsetEnv": "unsetenv",
                         "AppendPath": "append-path",
                         "PrependPath": "prepend-path",
                         "RemovePath": "remove-path",
                     }[type(i).__name__],
                     i.name,
-                    i.value,
+                    i.value if type(i).__name__ != "UnsetEnv" else "",
                 )
                 for i in env
             ]
