@@ -4,13 +4,13 @@ set -euo pipefail
 ROOT=$(realpath $(dirname $0))
 cd $ROOT
 
-SPACK_DIR=$(mktemp -d)
-trap "rm -rf $SPACK_DIR" exit
+SPACK=$(mktemp -d)
+trap "rm -rf $SPACK" exit
 
-git clone https://github.com/spack/spack $SPACK_DIR
-SPACK=$SPACK_DIR/bin/spack
+git clone https://github.com/spack/spack $SPACK
+source $SPACK/share/spack/setup-env.sh
 
-$SPACK -C ./config apply --install ./tmp/install --modules ./tmp/modules modules/*
+spack -C ./config apply --install ./tmp/install --modules ./tmp/modules modules/*
 
 unset MODULEPATH
 module use ./tmp/modules
