@@ -46,11 +46,12 @@ def setup_parser(subparser):
 def apply(parser, args):
     class Module:
         def __init__(self, name, specs, variables, whatis):
-            self.name, self.specs, self.variables, self.whatis = (
+            self.name, self.specs, self.variables, self.whatis, self.write_modulefile = (
                 name,
                 specs,
                 variables,
                 whatis,
+                write_modulefile,
             )
             self.prefix = fs.join_path(args.install, self.name)
             self.env_file = fs.join_path(self.prefix, "spack.yaml")
@@ -118,6 +119,7 @@ def apply(parser, args):
             [s for spec in m["specs"] for s in spack.cmd.parse_specs(spec)],
             m.get("variables", {}),
             m.get("whatis", ""),
+            m.get("write_modulefile", False),
         )
         for c in args.configs
         for m in syaml.load(c)
@@ -133,7 +135,7 @@ def apply(parser, args):
         m.env.concretize(force=True)
         m.env.install_all()
 
-        if m.get('write_modulefile', True):
+        if m.write_modulefile:
             tty.msg("Writing modulefile at %s" % m.module_file)
 
             fs.mkdirp(fs.ancestor(m.module_file))
