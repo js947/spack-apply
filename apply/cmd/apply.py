@@ -133,11 +133,12 @@ def apply(parser, args):
         m.env.concretize(force=True)
         m.env.install_all()
 
-        tty.msg("Writing modulefile at %s" % m.module_file)
+        if m.get['write_modulefile', True):
+            tty.msg("Writing modulefile at %s" % m.module_file)
 
-        fs.mkdirp(fs.ancestor(m.module_file))
-        with open(m.module_file, "w") as f:
-            f.write(m.module_defn)
+            fs.mkdirp(fs.ancestor(m.module_file))
+            with open(m.module_file, "w") as f:
+                f.write(m.module_defn)
 
         print()
 
