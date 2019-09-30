@@ -5,15 +5,18 @@ ROOT=$(realpath $(dirname $0))
 cd $ROOT
 
 SPACK=$(mktemp -d)
-trap "rm -rf $SPACK" exit
+trap "rm -rf $SPACK" EXIT
 
 git clone https://github.com/spack/spack $SPACK
 source $SPACK/share/spack/setup-env.sh
 
-spack -C ./config apply --install ./tmp/install --modules ./tmp/modules modules/*
+INSTALL=$(mktemp -d)
+MODULES=$(mktemp -d)
+trap "rm -rf $SPACK $INSTALL $MODULES" EXIT
 
-unset MODULEPATH
-module use ./tmp/modules
+spack -C ./config apply --install $INSTALL --modules $MODULES modules/*
+
+module use $MODULES
 module avail
 module whatis zlib/1
 
