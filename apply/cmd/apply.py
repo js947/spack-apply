@@ -119,7 +119,7 @@ def apply(parser, args):
             [s for spec in m["specs"] for s in spack.cmd.parse_specs(spec)],
             m.get("variables", {}),
             m.get("whatis", ""),
-            m.get("write_modulefile", False),
+            m.get("write_modulefile", True),
         )
         for c in args.configs
         for m in syaml.load(c)
