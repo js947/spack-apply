@@ -45,7 +45,7 @@ def setup_parser(subparser):
 
 def apply(parser, args):
     class Module:
-        def __init__(self, name, specs, variables, whatis):
+        def __init__(self, name, specs, variables, whatis, write_modulefile):
             self.name, self.specs, self.variables, self.whatis, self.write_modulefile = (
                 name,
                 specs,
