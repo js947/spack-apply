@@ -3,12 +3,12 @@ set -euo pipefail
 
 ROOT=$(realpath $(dirname $0))
 cd $ROOT
-if which -s spack
-then
-  SPACK=spack
-else
-  SPACK=$ROOT/../spack/bin/spack
-fi
+
+SPACK_DIR=$(mktemp -d)
+trap "rm -rf $SPACK_DIR" exit
+
+git clone https://github.com/spack/spack $SPACK_DIR
+SPACK=$SPACK_DIR/bin/spack
 
 $SPACK -C ./config apply --install ./tmp/install --modules ./tmp/modules modules/*
 
