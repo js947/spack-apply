@@ -45,19 +45,17 @@ def setup_parser(subparser):
 
 def apply(parser, args):
     class Module:
-        def __init__(self, name, specs, variables, whatis, write_modulefile):
-            self.name, self.specs, self.variables, self.whatis, self.write_modulefile = (
-                name,
-                specs,
-                variables,
-                whatis,
-                write_modulefile,
-            )
+        def __init__(self, name, specs, **kwargs):
+            self.name, self.specs = (name, specs)
+            self.attrs = kwargs
             self.prefix = fs.join_path(args.install, self.name)
             self.env_file = fs.join_path(self.prefix, "spack.yaml")
             self.module_file = fs.join_path(args.modules, self.name)
 
             self._env = None
+
+        def __getattr__(self, attr):
+            return self.attrs[attr]
 
         @property
         def env(self):
@@ -73,6 +71,7 @@ def apply(parser, args):
         def env_defn(self):
             yaml_dict = {}
             yaml_dict["view"] = fs.join_path(args.install, self.name)
+            yaml_dict["concretization"] = self.concretization
             yaml_spec_list = yaml_dict.setdefault("specs", [])
             yaml_spec_list[:] = [str(s) for s in self.specs]
 
@@ -117,9 +116,10 @@ def apply(parser, args):
         Module(
             m["name"],
             [s for spec in m["specs"] for s in spack.cmd.parse_specs(spec)],
-            m.get("variables", {}),
-            m.get("whatis", ""),
-            m.get("write_modulefile", True),
+            variables=m.get("variables", {}),
+            whatis=m.get("whatis", ""),
+            write_modulefile=m.get("write_modulefile", True),
+            concretization=m.get("concretization", "together"),
         )
         for c in args.configs
         for m in syaml.load(c)
