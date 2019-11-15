@@ -14,7 +14,7 @@ INSTALL=$(mktemp -d)
 MODULES=$(mktemp -d)
 trap "rm -rf $SPACK $INSTALL $MODULES" EXIT
 
-spack -C ./config apply --install $INSTALL --modules $MODULES modules/*
+spack -vd -C ./config apply --install $INSTALL --modules $MODULES modules/*
 
 module use $MODULES
 module avail
