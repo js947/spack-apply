@@ -92,20 +92,18 @@ def apply(parser, args):
             for k, v in self.variables.items():
                 env.set(k, v)
 
+            module_commands = {
+                "SetEnv": lambda i: ("setenv", i.name, i.value),
+                "UnsetEnv": lambda i: ("unsetenv", i.name, ""),
+                "AppendPath": lambda i: ("append-path", i.name, i.value),
+                "PrependPath": lambda i: ("prepend-path", i.name, i.value),
+                "RemovePath": lambda i: ("remove-path", i.name, i.value),
+            }
+
             modulefile = ["#%Module -*- tcl -*-"]
             modulefile += [
-                "{} {: >30} {}".format(
-                    {
-                        "SetEnv": "setenv",
-                        "UnsetEnv": "unsetenv",
-                        "AppendPath": "append-path",
-                        "PrependPath": "prepend-path",
-                        "RemovePath": "remove-path",
-                    }[type(i).__name__],
-                    i.name,
-                    i.value if type(i).__name__ != "UnsetEnv" else "",
-                )
-                for i in env
+                "{} {: >30} {}".format(*module_commands[type(i).__name__](i))
+                for i in env if type(i).__name__ in module_commands
             ]
             if self.whatis:
                 modulefile.append('module-whatis "%s"' % str(self.whatis))
