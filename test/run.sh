@@ -14,7 +14,8 @@ INSTALL=$(mktemp -d)
 MODULES=$(mktemp -d)
 trap "rm -rf $SPACK $INSTALL $MODULES" EXIT
 
-spack -vd -C ./config apply --install $INSTALL --modules $MODULES modules/*
+ln -sf $(realpath config/config.yaml) $(which spack | xargs dirname | xargs dirname)/etc/spack
+spack -vd apply --install $INSTALL --modules $MODULES modules/*
 
 module use $MODULES
 module avail
