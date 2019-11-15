@@ -86,6 +86,7 @@ def apply(parser, args):
 
             for spec in self.env._get_environment_specs():
                 build_environment.set_module_variables_for_package(spec.package)
+                spec.package.setup_build_environment(_, env)
                 spec.package.setup_run_environment(_, env)
 
             for k, v in self.variables.items():
