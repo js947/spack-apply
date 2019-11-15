@@ -1,6 +1,6 @@
 config:
   extensions:
-    - ../../spack-apply
+    - ../../spack-apply/apply
 
   install_tree: /var/lib/gitlab-runner/spack/install
   source_cache: /var/lib/gitlab-runner/spack/cache
