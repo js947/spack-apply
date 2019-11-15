@@ -3,3 +3,4 @@ __pycache__
 
 spack
 test/tmp
+test/*.log
