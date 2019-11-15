@@ -67,7 +67,6 @@ def apply(parser, args):
                 )
             return self._env
 
-        @property
         def env_defn(self):
             yaml_dict = {}
             yaml_dict["view"] = fs.join_path(args.install, self.name)
@@ -77,7 +76,6 @@ def apply(parser, args):
 
             return {"spack": yaml_dict}
 
-        @property
         def module_defn(self):
             env = spack.util.environment.inspect_path(
                 self.prefix,
@@ -130,7 +128,7 @@ def apply(parser, args):
 
         fs.mkdirp(fs.ancestor(m.env_file))
         with open(m.env_file, "w") as f:
-            ruamel.yaml.dump(m.env_defn, f)
+            ruamel.yaml.dump(m.env_defn(), f)
 
         m.env.concretize(force=True)
         m.env.install_all()
@@ -140,7 +138,7 @@ def apply(parser, args):
 
             fs.mkdirp(fs.ancestor(m.module_file))
             with open(m.module_file, "w") as f:
-                f.write(m.module_defn)
+                f.write(m.module_defn())
 
         print()
 
