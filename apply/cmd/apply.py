@@ -93,7 +93,7 @@ def apply(parser, args):
                 env.set(k, v)
 
             module_commands = {
-                "SetEnv": lambda i: ("setenv", i.name, i.value),
+                "SetEnv": lambda i: ("setenv", i.name, i.value) if i.value else ("",)*3,
                 "UnsetEnv": lambda i: ("unsetenv", i.name, ""),
                 "AppendPath": lambda i: ("append-path", i.name, i.value),
                 "PrependPath": lambda i: ("prepend-path", i.name, i.value),
