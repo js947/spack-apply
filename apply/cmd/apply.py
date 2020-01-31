@@ -131,6 +131,7 @@ def apply(parser, args):
 
         m.env.concretize(force=True)
         m.env.install_all()
+        m.env.regenerate_views()
 
         if m.write_modulefile:
             tty.msg("Writing modulefile at %s" % m.module_file)
