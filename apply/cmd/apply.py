@@ -131,6 +131,8 @@ def apply(parser, args):
     ]
 
     for m in modules:
+        if args.tag and m.tag not in args.tag:
+            continue
         if m.tag and m.tag not in args.tag:
             continue
 

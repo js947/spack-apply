@@ -1,3 +1,7 @@
+- name: zlib/untagged
+  specs:
+  - zlib@1.2.11
+
 - name: zlib/cpu
   tag: cpu
   specs:
