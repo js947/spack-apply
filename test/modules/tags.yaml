@@ -1,0 +1,9 @@
+- name: zlib/cpu
+  tag: cpu
+  specs:
+  - zlib@1.2.11
+
+- name: zlib/gpu
+  tag: gpu
+  specs:
+  - zlib@1.2.11
