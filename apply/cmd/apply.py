@@ -36,6 +36,12 @@ def setup_parser(subparser):
         help="where to put the tree of modulefiles",
     )
     subparser.add_argument(
+        "--tag",
+        type=str,
+        action='append',
+        help='only build modules with these tags'
+    )
+    subparser.add_argument(
         "configs",
         nargs=argparse.REMAINDER,
         type=argparse.FileType("r"),
@@ -117,12 +123,16 @@ def apply(parser, args):
             whatis=m.get("whatis", ""),
             write_modulefile=m.get("write_modulefile", True),
             concretization=m.get("concretization", "together"),
+            tag=m.get("tag", "")
         )
         for c in args.configs
         for m in syaml.load(c)
     ]
 
     for m in modules:
+        if m.tag and m.tag not in args.tag:
+            continue
+
         tty.msg("Building module %s at %s" % (m.name, m.prefix))
 
         fs.mkdirp(fs.ancestor(m.env_file))
