@@ -29,6 +29,9 @@ find $CPATH -name zlib.h -exec ls -l {} \;
 
 module unload zlib/2
 
+echo building default modules
+spack apply --install $INSTALL --modules $MODULES modules/tags.yaml
+
 echo building cpu modules
 spack apply --tag cpu --install $INSTALL --modules $MODULES modules/tags.yaml
 module load zlib/cpu
