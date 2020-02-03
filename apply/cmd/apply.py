@@ -38,6 +38,7 @@ def setup_parser(subparser):
     subparser.add_argument(
         "--tag",
         type=str,
+        default=[],
         action='append',
         help='only build modules with these tags'
     )
