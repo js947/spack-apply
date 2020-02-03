@@ -15,7 +15,7 @@ MODULES=$(mktemp -d)
 trap "rm -rf $SPACK $INSTALL $MODULES" EXIT
 
 ln -sf $(realpath config/config.yaml) $(which spack | xargs dirname | xargs dirname)/etc/spack
-spack -vd apply --install $INSTALL --modules $MODULES modules/zlib.yaml
+spack apply --install $INSTALL --modules $MODULES modules/zlib.yaml
 
 module use $MODULES
 module avail
@@ -29,5 +29,5 @@ find $CPATH -name zlib.h -exec ls -l {} \;
 
 module unload zlib/2
 
-spack -vd apply --tag cpu --install $INSTALL --modules $MODULES modules/tags.yaml
-spack -vd apply --tag gpu --install $INSTALL --modules $MODULES modules/tags.yaml
+spack apply --tag cpu --install $INSTALL --modules $MODULES modules/tags.yaml
+spack apply --tag gpu --install $INSTALL --modules $MODULES modules/tags.yaml
