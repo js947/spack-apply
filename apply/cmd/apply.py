@@ -93,7 +93,7 @@ def apply(parser, args):
                 env.set(k, v)
 
             module_commands = {
-                "SetEnv": lambda i: ("setenv", i.name, '"' + i.value + '"') if i.value else ("",)*3,
+                "SetEnv": lambda i: ("setenv", i.value) if i.value else ("",)*3,
                 "UnsetEnv": lambda i: ("unsetenv", i.name, ""),
                 "AppendPath": lambda i: ("append-path", i.name, i.value),
                 "PrependPath": lambda i: ("prepend-path", i.name, i.value),
@@ -102,7 +102,7 @@ def apply(parser, args):
 
             modulefile = ["#%Module -*- tcl -*-"]
             modulefile += [
-                "{} {: >30} {}".format(*module_commands[type(i).__name__](i))
+                '{} {: >30} "{}"'.format(*module_commands[type(i).__name__](i))
                 for i in env if type(i).__name__ in module_commands
             ]
             if self.whatis:
