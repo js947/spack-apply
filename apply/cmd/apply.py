@@ -126,7 +126,7 @@ def apply(parser, args):
         tty.msg("Building module %s at %s" % (m.name, m.prefix))
 
         fs.mkdirp(fs.ancestor(m.env_file))
-        with open(m.env_file, "w") as f:
+        with fs.write_tmp_and_move(m.env_file, "w") as f:
             ruamel.yaml.dump(m.env_defn(), f)
 
         m.env.concretize(force=True)
@@ -137,7 +137,7 @@ def apply(parser, args):
             tty.msg("Writing modulefile at %s" % m.module_file)
 
             fs.mkdirp(fs.ancestor(m.module_file))
-            with open(m.module_file, "w") as f:
+            with fs.write_tmp_and_move(m.module_file, "w") as f:
                 f.write(m.module_defn())
 
         print()
