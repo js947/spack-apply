@@ -136,7 +136,7 @@ def apply(parser, args):
         if m.tag and m.tag not in args.tag:
             continue
 
-        tty.msg("Building module %s at %s" % (m.name, m.prefix))
+        tty.msg("Building module %s" % m.name)
 
         fs.mkdirp(fs.ancestor(m.env_file))
         with fs.write_tmp_and_move(m.env_file) as f:
@@ -144,6 +144,8 @@ def apply(parser, args):
 
         m.env.concretize(force=True)
         m.env.install_all()
+
+        tty.msg("Updating view at %s" % m.prefix)
         m.env.regenerate_views()
 
         if m.write_modulefile:
