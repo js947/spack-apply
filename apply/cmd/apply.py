@@ -142,7 +142,8 @@ def apply(parser, args):
         with fs.write_tmp_and_move(m.env_file) as f:
             ruamel.yaml.dump(m.env_defn(), f)
 
-        m.env.concretize(force=True)
+        cs = m.env.concretize(force=True)
+        ev.display_specs(cs)
         m.env.install_all()
 
         tty.msg("Updating view at %s" % m.prefix)
