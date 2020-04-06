@@ -2,5 +2,5 @@ config:
   extensions:
     - ../../spack-apply
 
-  install_tree: /var/lib/gitlab-runner/spack/install
-  source_cache: /var/lib/gitlab-runner/spack/cache
+  #install_tree: /var/lib/gitlab-runner/spack/install
+  #source_cache: /var/lib/gitlab-runner/spack/cache
