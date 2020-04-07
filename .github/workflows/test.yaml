@@ -12,5 +12,7 @@ jobs:
         run: sudo apt-get install -y environment-modules
       - name: install spack
         run: curl -L https://github.com/spack/spack/archive/develop.tar.gz | sudo tar xzf - --strip-components=1 -C /usr/local
+      - name: install extension
+        run: python test/addextension.py $(spack config --scope site edit config --print-file) $(pwd)
       - name: run tests
         run: bash test/run.sh
