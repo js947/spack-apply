@@ -1,9 +1,13 @@
 #!/bin/bash
 set -euo pipefail
 
-spack apply --install ./install --modules ./modulefiles modules/zlib.yaml
+tests=$(realpath $(dirname $0))/modules
+install=$(realpath ./install)
+modules=$(realpath ./modulefiles)
 
-module use $MODULES
+spack apply --install $install --modules $modules $tests/zlib.yaml
+
+module use $modules
 module avail
 module whatis zlib/1
 
@@ -16,19 +20,19 @@ find $CPATH -name zlib.h -exec ls -l {} \;
 module unload zlib/2
 
 echo building default modules
-spack apply --install $INSTALL --modules $MODULES modules/tags.yaml
+spack apply --install $install --modules $modules $tests/tags.yaml
 module show zlib/untagged
 ! module show zlib/cpu
 ! module show zlib/gpu
 
 echo building cpu modules
-spack apply --tag cpu --install $INSTALL --modules $MODULES modules/tags.yaml
+spack apply --tag cpu --install $install --modules $modules $tests/tags.yaml
 module show zlib/untagged
 module show zlib/cpu
 ! module show zlib/gpu
 
 echo building gpu modules
-spack apply --tag gpu --install $INSTALL --modules $MODULES modules/tags.yaml
+spack apply --tag gpu --install $install --modules $modules $tests/tags.yaml
 module show zlib/untagged
 module show zlib/cpu
 module show zlib/gpu
