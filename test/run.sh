@@ -1,21 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-ROOT=$(realpath $(dirname $0))
-cd $ROOT
-
-SPACK=$(mktemp -d)
-trap "rm -rf $SPACK" EXIT
-
-git clone --depth=1 https://github.com/spack/spack $SPACK
-source $SPACK/share/spack/setup-env.sh
-
-INSTALL=$(mktemp -d)
-MODULES=$(mktemp -d)
-trap "rm -rf $SPACK $INSTALL $MODULES" EXIT
-
-ln -sf $(realpath config/config.yaml) $(which spack | xargs dirname | xargs dirname)/etc/spack
-spack apply --install $INSTALL --modules $MODULES modules/zlib.yaml
+spack apply --install ./install --modules ./modulefiles modules/zlib.yaml
 
 module use $MODULES
 module avail

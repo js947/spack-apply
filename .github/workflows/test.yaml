@@ -9,7 +9,7 @@ jobs:
       - name: checkout
         uses: actions/checkout@v2
       - name: install modules
-        run: apt-get install -y environment-modules
+        run: sudo apt-get install -y environment-modules
       - name: install spack
         run: curl -L https://github.com/spack/spack/archive/develop.tar.gz | tar xf - --strip-components=1 -C /usr/local
       - name: run tests
