@@ -8,10 +8,11 @@ except IOError:
 
 print(config)
 
-if 'extensions' not in config:
-    config['extensions'] = []
-
-config['extensions'] += [sys.argv[2]]
+if 'config' not in config:
+    config['config'] = {}
+if 'extensions' not in config['config']:
+    config['config']['extensions'] = []
+config['config']['extensions'] += [sys.argv[2]]
 
 print(config)
 
