@@ -11,9 +11,9 @@ jobs:
       - name: install modules
         run: sudo apt-get install -y environment-modules
       - name: install spack
-        run:
-        - curl -L https://github.com/spack/spack/archive/develop.tar.gz | sudo tar xzf - --strip-components=1 -C /usr/local
-        - sudo chmod 777 /usr/local/opt
+        run: curl -L https://github.com/spack/spack/archive/develop.tar.gz | sudo tar xzf - --strip-components=1 -C /usr/local
+      - name: fix spack permissions
+        run: sudo chmod 777 /usr/local/opt
       - name: install extension
         run: sudo python test/addextension.py $(spack config --scope site edit config --print-file) $(pwd)
       - name: run tests
