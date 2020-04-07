@@ -10,11 +10,11 @@ jobs:
         uses: actions/checkout@v2
       - name: install modules
         run: sudo apt-get install -y environment-modules
+      - name: fix /usr/local permissions
+        run: sudo chmod -R 777 /usr/local
       - name: install spack
-        run: curl -L https://github.com/spack/spack/archive/develop.tar.gz | sudo tar xzf - --strip-components=1 -C /usr/local
-      - name: fix spack permissions
-        run: sudo chmod 777 /usr/local/opt
+        run: curl -L https://github.com/spack/spack/archive/develop.tar.gz | tar xzf - --strip-components=1 -C /usr/local
       - name: install extension
-        run: sudo python test/addextension.py $(spack config --scope site edit config --print-file) $(pwd)
+        run: python test/addextension.py $(spack config --scope site edit config --print-file) $(pwd)
       - name: run tests
         run: bash test/run.sh
