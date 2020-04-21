@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -l
 set -euo pipefail
 
 tests=$(realpath $(dirname $0))/modules
