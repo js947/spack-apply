@@ -10,6 +10,6 @@ jobs:
       - name: checkout
         uses: actions/checkout@v2
       - name: install extension
-        run: python test/addextension.py $(spack config --scope site edit config --print-file) $(pwd)
+        run: bash test/addextension.sh
       - name: run tests
         run: bash test/run.sh
