@@ -5,7 +5,7 @@ jobs:
   test:
     name: test1
     runs-on: ubuntu-latest
-    image: spack/centos7
+    container: spack/centos7
     steps:
       - name: checkout
         uses: actions/checkout@v2
