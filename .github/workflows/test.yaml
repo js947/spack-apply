@@ -9,8 +9,6 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v2
-      - name: install modules
-        run: sudo apt-get install -y environment-modules
       - name: install extension
         run: python test/addextension.py $(spack config --scope site edit config --print-file) $(pwd)
       - name: run tests
